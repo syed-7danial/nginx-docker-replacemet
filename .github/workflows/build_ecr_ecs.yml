@@ -1,0 +1,74 @@
+name: Build and Deploy Nginx
+
+# Trigger the workflow manually with inputs
+on:
+  workflow_dispatch:
+    inputs:
+      ecs_cluster:
+        description: 'ECS Cluster Name'
+        required: true
+        type: choice
+        options:
+          - cluster1
+          - cluster2
+          - cluster3
+      ecr_repo:
+        description: 'ECR Repository Name'
+        required: true
+        type: choice
+        options:
+          - repo1
+          - repo2
+          - repo3
+      server_name:
+        description: 'Server Name'
+        required: true
+        type: string
+      custom_message:
+        description: 'Custom Message'
+        required: true
+        type: string
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Login to Amazon ECR
+      run: |
+        aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ github.event.inputs.ecr_repo }}.dkr.ecr.us-east-1.amazonaws.com
+
+    - name: Replace placeholders in nginx.conf
+      run: |
+        sed -i 's/{{SERVER_NAME}}/${{ github.event.inputs.server_name }}/g' nginx/nginx.conf
+        sed -i 's/{{CUSTOM_MESSAGE}}/${{ github.event.inputs.custom_message }}/g' nginx/nginx.conf
+
+    - name: Build Docker image
+      run: |
+        docker build -t ${{ github.event.inputs.ecr_repo }}:latest .
+
+    - name: Tag Docker image
+      run: |
+        docker tag ${{ github.event.inputs.ecr_repo }}:latest ${{ github.event.inputs.ecr_repo }}.dkr.ecr.us-east-1.amazonaws.com/${{ github.event.inputs.ecr_repo }}:latest
+
+    - name: Push Docker image to ECR
+      run: |
+        docker push ${{ github.event.inputs.ecr_repo }}.dkr.ecr.us-east-1.amazonaws.com/${{ github.event.inputs.ecr_repo }}:latest
+
+    - name: Update ECS service
+      run: |
+        ecs_service=$(aws ecs list-services --cluster ${{ github.event.inputs.ecs_cluster }} --query 'serviceArns[0]' --output text)
+        ecs_task_definition=$(aws ecs describe-services --cluster ${{ github.event.inputs.ecs_cluster }} --services $ecs_service --query 'services[0].taskDefinition' --output text)
+        new_task_definition=$(echo $ecs_task_definition | sed "s/:.*$//g")
+
+        aws ecs update-service --cluster ${{ github.event.inputs.ecs_cluster }} --service $ecs_service --force-new-deployment
