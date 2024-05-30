@@ -12,10 +12,10 @@ on:
         description: 'ECR Repository Name'
         required: true
         type: string
-      server_name:
-        description: 'Server Name'
+      placeholder_values:
+        description: 'Placeholder Values'
         required: true
-        type: changelog
+        type: string
       aws_region:
         description: 'AWS Region'
         required: true
@@ -46,8 +46,13 @@ jobs:
 
     - name: Replace placeholders in nginx.conf
       run: |
-        sed -i 's/{{SERVER_NAME}}/${{ github.event.inputs.server_name }}/g' nginx.conf
-        sed -i 's/{{CUSTOM_MESSAGE}}/${{ github.event.inputs.custom_message }}/g' nginx.conf
+        PLACEHOLDER_VALUES="${{ github.event.inputs.placeholder_values }}"
+        IFS=$'\n'       # Set the Internal Field Separator to newline
+        for placeholder in $PLACEHOLDER_VALUES; do
+          key=$(echo "$placeholder" | cut -d'=' -f1)
+          value=$(echo "$placeholder" | cut -d'=' -f2-)
+          sed -i "s|{{${key}}}|${value}|g" nginx/nginx.conf
+        done
 
     - name: Build Docker image
       run: |
