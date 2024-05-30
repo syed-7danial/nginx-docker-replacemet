@@ -46,7 +46,7 @@ jobs:
 
     - name: Login to Amazon ECR
       run: |
-        aws ecr get-login-password --region ${{ github.event.inputs.aws_region }} | docker login --username AWS --password-stdin ${{ github.event.inputs.ecr_repo }}.dkr.ecr.${{ github.event.inputs.aws_region }}.amazonaws.com
+        aws ecr get-login-password --region ${{ github.event.inputs.aws_region }} | docker login --username AWS --password-stdin 489994096722.dkr.ecr.${{ github.event.inputs.aws_region }}.amazonaws.com
 
     - name: Replace placeholders in nginx.conf
       run: |
@@ -59,11 +59,11 @@ jobs:
 
     - name: Tag Docker image
       run: |
-        docker tag ${{ github.event.inputs.ecr_repo }}:latest ${{ github.event.inputs.ecr_repo }}.dkr.ecr.${{ github.event.inputs.aws_region }}.amazonaws.com/${{ github.event.inputs.ecr_repo }}:latest
+        docker tag ${{ github.event.inputs.ecr_repo }}:latest 489994096722.dkr.ecr.${{ github.event.inputs.aws_region }}.amazonaws.com/${{ github.event.inputs.ecr_repo }}:latest
 
     - name: Push Docker image to ECR
       run: |
-        docker push ${{ github.event.inputs.ecr_repo }}.dkr.ecr.${{ github.event.inputs.aws_region }}.amazonaws.com/${{ github.event.inputs.ecr_repo }}:latest
+        docker push 489994096722.dkr.ecr.${{ github.event.inputs.aws_region }}.amazonaws.com/${{ github.event.inputs.ecr_repo }}:latest
 
     - name: Update ECS service
       run: |
