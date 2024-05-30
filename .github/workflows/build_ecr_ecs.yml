@@ -50,8 +50,8 @@ jobs:
 
     - name: Replace placeholders in nginx.conf
       run: |
-        sed -i 's/{{SERVER_NAME}}/${{ github.event.inputs.server_name }}/g' nginx/nginx.conf
-        sed -i 's/{{CUSTOM_MESSAGE}}/${{ github.event.inputs.custom_message }}/g' nginx/nginx.conf
+        sed -i 's/{{SERVER_NAME}}/${{ github.event.inputs.server_name }}/g' nginx.conf
+        sed -i 's/{{CUSTOM_MESSAGE}}/${{ github.event.inputs.custom_message }}/g' nginx.conf
 
     - name: Build Docker image
       run: |
