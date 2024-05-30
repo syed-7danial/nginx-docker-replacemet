@@ -15,11 +15,7 @@ on:
       server_name:
         description: 'Server Name'
         required: true
-        type: string
-      custom_message:
-        description: 'Custom Message'
-        required: true
-        type: string
+        type: changelog
       aws_region:
         description: 'AWS Region'
         required: true
