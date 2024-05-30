@@ -51,7 +51,7 @@ jobs:
         for placeholder in $PLACEHOLDER_VALUES; do
           key=$(echo "$placeholder" | cut -d'=' -f1)
           value=$(echo "$placeholder" | cut -d'=' -f2-)
-          sed -i "s|{{${key}}}|${value}|g" nginx/nginx.conf
+          sed -i "s|{{${key}}}|${value}|g" nginx.conf
         done
 
     - name: Build Docker image
