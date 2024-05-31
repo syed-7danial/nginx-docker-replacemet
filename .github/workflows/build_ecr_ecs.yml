@@ -12,6 +12,10 @@ on:
         description: 'ECR Repository Name'
         required: true
         type: string
+      ingestor_task_definition_family:
+        description: 'Task Definiton'
+        required: true
+        type: string
       placeholder_values:
         description: 'Placeholder Values'
         required: true
