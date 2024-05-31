@@ -8,6 +8,10 @@ on:
         description: 'ECS Cluster Name'
         required: true
         type: string
+      ecs_service:
+        description: 'ECS Service Name'
+        required: true
+        type: string
       ecr_repo:
         description: 'ECR Repository Name'
         required: true
