@@ -84,4 +84,5 @@ jobs:
         task-definition: task-definition.json
         service: ${{ github.event.inputs.ecs_service }}
         cluster: ${{ github.event.inputs.ecs_cluster }}
+        desired-count: 1
         wait-for-service-stability: true
